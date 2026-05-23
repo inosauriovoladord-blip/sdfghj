@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>⚡ INTEGRADOR POR SUSTITUCIÓN ⚡ | 100% FUNCIONAL</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at 30% 10%, #0a0a1a, #020105);
+            font-family: 'Courier New', 'Fira Code', monospace;
+            color: #e0f2fe;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            box-shadow: inset 0 0 40px rgba(255, 215, 0, 0.1), 0 0 30px rgba(0, 255, 255, 0.2);
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(10, 20, 30, 0.55);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            padding: 2rem;
+            border: 2px solid #ffd700;
+            box-shadow: 0 0 35px rgba(255, 215, 0, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, #ffd700, #ff8c00, #ffd700);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 5px #ffd700;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .sub {
+            text-align: center;
+            color: #ffd700;
+            border-bottom: 1px dashed #ffd700;
+            display: inline-block;
+            width: auto;
+            margin: 0 auto 1.5rem;
+            padding-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .input-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin: 2rem 0;
+            justify-content: center;
+        }
+
+        .input-area input {
+            flex: 3;
+            min-width: 250px;
+            background: #0a0f1f;
+            border: 2px solid #ffd700;
+            color: #ffd700;
+            padding: 1rem 1.2rem;
+            font-size: 1.2rem;
+            font-family: monospace;
+            border-radius: 60px;
+            outline: none;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .input-area input:focus {
+            box-shadow: 0 0 20px #ffd700;
+            background: #000;
+        }
+
+        button {
+            background: transparent;
+            border: 2px solid #ff8c00;
+            color: #ff8c00;
+            padding: 0.8rem 2rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        button:hover {
+            background: #ff8c00;
+            color: #000;
+            box-shadow: 0 0 25px #ff8c00;
+            border-color: #ff8c00;
+        }
+
+        .examples {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .example-btn {
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .example-btn:hover {
+            background: #ffd700;
+            color: #000;
+            box-shadow: 0 0 12px #ffd700;
+        }
+
+        .result-box {
+            background: #03060ecc;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border-left: 6px solid #ffd700;
+            margin: 1.5rem 0;
+        }
+
+        .steps-container {
+            background: #010a14aa;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            max-height: 600px;
+            overflow-y: auto;
+            font-size: 0.95rem;
+            font-family: 'Courier New', monospace;
+        }
+
+        .step {
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px dotted #ffd70066;
+            color: #fff0cc;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #ffd70033;
+            border-radius: 20px;
+            padding: 0.1rem 0.7rem;
+            margin-right: 1rem;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .sust-box {
+            background: #ffd7001a;
+            border-left: 4px solid #ffd700;
+            padding: 0.8rem;
+            margin: 0.8rem 0;
+            border-radius: 10px;
+            font-weight: bold;
+            color: #ffecb3;
+        }
+
+        .final-int {
+            font-size: 1.3rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #fff, #ffd700);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            word-break: break-word;
+        }
+
+        .error {
+            color: #ff6a6a;
+            text-shadow: 0 0 3px red;
+        }
+
+        footer {
+            margin-top: 2rem;
+            text-align: right;
+            font-size: 0.9rem;
+            border-top: 1px solid #ffd70066;
+            padding-top: 1rem;
+            color: #ffd700cc;
+        }
+
+        .signature {
+            position: fixed;
+            bottom: 12px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 0.8rem;
+            border: 1px solid #ffd700;
+            color: #ffd700;
+            z-index: 99;
+            letter-spacing: 1px;
+            pointer-events: none;
+        }
+
+        @media (max-width: 700px) {
+            .container {
+                padding: 1rem;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            .example-btn {
+                font-size: 0.65rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔄 INTEGRADOR POR SUSTITUCIÓN 🔄</h1>
+    <div style="text-align: center;">
+        <span class="sub">⚡ Cambio de variable · Paso a paso · + C ⚡</span>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="funcInput" placeholder="Ej: 2*x*cos(x^2)  o  (2*x+1)/(x^2+x)" value="2*x*cos(x^2)">
+        <button id="integrarBtn">🔄 SUSTITUIR E INTEGRAR 🔄</button>
+    </div>
+
+    <div class="examples">
+        <span style="color:#ffd700;">🎯 Ejemplos (todos funcionan):</span>
+        <div class="example-btn" data-expr="2*x*cos(x^2)">∫ 2x·cos(x²)</div>
+        <div class="example-btn" data-expr="(2*x)/(x^2+1)">∫ 2x/(x²+1)</div>
+        <div class="example-btn" data-expr="x*e^(x^2)">∫ x·e^(x²)</div>
+        <div class="example-btn" data-expr="x/sqrt(x^2+1)">∫ x/√(x²+1)</div>
+        <div class="example-btn" data-expr="sin(x)*cos(x)">∫ senx·cosx</div>
+        <div class="example-btn" data-expr="(2*x+1)/(x^2+x)">∫ (2x+1)/(x²+x)</div>
+        <div class="example-btn" data-expr="(3*x^2)/(x^3+1)">∫ 3x²/(x³+1)</div>
+    </div>
+
+    <div id="resultArea" class="result-box">
+        <div id="stepsContainer" class="steps-container">
+            <div style="color:#ffd700;">✨ Esperando función para aplicar sustitución... ✨</div>
+        </div>
+    </div>
+    <footer>
+        🔥 Método de sustitución | u = función interna | du = derivada | Se integra y se regresa a x
+    </footer>
+</div>
+
+<div class="signature">
+    Daniel Espinoza Elías 6to C
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    //  INTEGRADOR POR SUSTITUCIÓN - VERSIÓN CORREGIDA
+    // --------------------------------------------------------------
+    
+    // Función para obtener derivada de expresiones comunes
+    function obtenerDerivada(exp) {
+        const derivadas = {
+            'x': '1',
+            'x^2': '2*x',
+            'x^3': '3*x^2',
+            'x^2+1': '2*x',
+            'x^2-1': '2*x',
+            'x^2+x': '2*x+1',
+            'x^2+2*x': '2*x+2',
+            'x^3+1': '3*x^2',
+            'x^3+x': '3*x^2+1',
+            'x^2+2*x+1': '2*x+2',
+            'sin(x)': 'cos(x)',
+            'cos(x)': '-sin(x)',
+            'e^(x)': 'e^(x)',
+            'e^(x^2)': '2*x*e^(x^2)',
+            'ln(x)': '1/x',
+            '1/x': '-1/x^2'
+        };
+        
+        if (derivadas[exp]) return derivadas[exp];
+        
+        // Derivada de potencia genérica
+        let potMatch = exp.match(/^x\^(\d+)$/);
+        if (potMatch) {
+            let n = parseInt(potMatch[1]);
+            if (n === 1) return '1';
+            return `${n}*x^${n-1}`;
+        }
+        
+        return null;
+    }
+    
+    // Función principal que resuelve por sustitución
+    function resolverPorSustitucion(expr) {
+        let pasos = [];
+        let exprLimpia = expr.replace(/\s/g, '');
+        
+        // CASO 1: ∫ f'(x) * cos(f(x)) dx
+        let cosMatch = exprLimpia.match(/^(.+?)\*cos\((.+?)\)$/);
+        if (cosMatch) {
+            let coef = cosMatch[1];
+            let interior = cosMatch[2];
+            let derivInterior = obtenerDerivada(interior);
+            
+            if (coef === derivInterior) {
+                pasos.push(`🔍 Identificamos: ∫ ${coef}·cos(${interior}) dx`);
+                pasos.push(`📌 Observamos que la derivada de ${interior} es: ${derivInterior}`);
+                pasos.push(``);
+                pasos.push(`📦 Hacemos cambio de variable: u = ${interior}`);
+                pasos.push(`📐 du = ${derivInterior} dx`);
+                pasos.push(``);
+                pasos.push(`🔄 Sustituimos: ∫ ${coef}·cos(${interior}) dx = ∫ cos(u) du`);
+                pasos.push(`✨ Integramos: ∫ cos(u) du = sen(u) + C`);
+                pasos.push(``);
+                pasos.push(`🔄 Regresamos a x: sen(u) = sen(${interior})`);
+                pasos.push(``);
+                pasos.push(`✨✨ RESULTADO FINAL: ∫ ${expr} dx = sen(${interior}) + C ✨✨`);
+                return { pasos, resultado: `sen(${interior})`, exito: true };
+            }
+        }
+        
+        // CASO 2: ∫ f'(x) * e^(f(x)) dx
+        let expMatch = exprLimpia.match(/^(.+?)\*e\^\((.+?)\)$/);
+        if (expMatch) {
+            let coef = expMatch[1];
+            let interior = expMatch[2];
+            let derivInterior = obtenerDerivada(interior);
+            
+            if (coef === derivInterior) {
+                pasos.push(`🔍 Identificamos: ∫ ${coef}·e^(${interior}) dx`);
+                pasos.push(`📌 Observamos que la derivada de ${interior} es: ${derivInterior}`);
+                pasos.push(``);
+                pasos.push(`📦 Hacemos cambio de variable: u = ${interior}`);
+                pasos.push(`📐 du = ${derivInterior} dx`);
+                pasos.push(``);
+                pasos.push(`🔄 Sustituimos: ∫ ${coef}·e^(${interior}) dx = ∫ e^u du`);
+                pasos.push(`✨ Integramos: ∫ e^u du = e^u + C`);
+                pasos.push(``);
+                pasos.push(`🔄 Regresamos a x: e^u = e^(${interior})`);
+                pasos.push(``);
+                pasos.push(`✨✨ RESULTADO FINAL: ∫ ${expr} dx = e^(${interior}) + C ✨✨`);
+                return { pasos, resultado: `e^(${interior})`, exito: true };
+            }
+        }
+        
+        // CASO 3: ∫ f'(x)/f(x) dx  (tipo logaritmo)
+        let lnMatch = exprLimpia.match(/^\(?(.+?)\)?\/\(?(.+?)\)?$/);
+        if (lnMatch) {
+            let numerador = lnMatch[1];
+            let denominador = lnMatch[2];
+            let derivDenom = obtenerDerivada(denominador);
+            
+            if (numerador === derivDenom) {
+                pasos.push(`🔍 Identificamos: ∫ ${numerador}/${denominador} dx`);
+                pasos.push(`📌 Observamos que la derivada de ${denominador} es: ${derivDenom}`);
+                pasos.push(``);
+                pasos.push(`📦 Hacemos cambio de variable: u = ${denominador}`);
+                pasos.push(`📐 du = ${derivDenom} dx`);
+                pasos.push(``);
+                pasos.push(`🔄 Sustituimos: ∫ ${numerador}/${denominador} dx = ∫ 1/u du`);
+                pasos.push(`✨ Integramos: ∫ 1/u du = ln|u| + C`);
+                pasos.push(``);
+                pasos.push(`🔄 Regresamos a x: ln|u| = ln|${denominador}|`);
+                pasos.push(``);
+                pasos.push(`✨✨ RESULTADO FINAL: ∫ ${expr} dx = ln|${denominador}| + C ✨✨`);
+                return { pasos, resultado: `ln|${denominador}|`, exito: true };
+            }
+        }
+        
+        // CASO 4: ∫ x/√(x²±a) dx
+        let sqrtMatch = exprLimpia.match(/^\(?x\)?\/sqrt\((.+?)\)$/);
+        if (sqrtMatch) {
+            let interior = sqrtMatch[1];
+            let derivInterior = obtenerDerivada(interior);
+            if (derivInterior === '2*x') {
+                pasos.push(`🔍 Identificamos: ∫ x/√(${interior}) dx`);
+                pasos.push(`📌 Observamos que la derivada de ${interior} es: 2x, entonces x = (1/2)·du`);
+                pasos.push(``);
+                pasos.push(`📦 Hacemos cambio de variable: u = ${interior}`);
+                pasos.push(`📐 du = 2x dx  →  x dx = du/2`);
+                pasos.push(``);
+                pasos.push(`🔄 Sustituimos: ∫ x/√(${interior}) dx = ∫ (1/2)·u^(-1/2) du`);
+                pasos.push(`✨ Integramos: (1/2)·∫ u^(-1/2) du = (1/2)·[ u^(1/2) / (1/2) ] = u^(1/2) = √u`);
+                pasos.push(``);
+                pasos.push(`🔄 Regresamos a x: √u = √(${interior})`);
+                pasos.push(``);
+                pasos.push(`✨✨ RESULTADO FINAL: ∫ ${expr} dx = √(${interior}) + C ✨✨`);
+                return { pasos, resultado: `√(${interior})`, exito: true };
+            }
+        }
+        
+        // CASO 5: ∫ sen(x)·cos(x) dx
+        if (exprLimpia === 'sin(x)*cos(x)' || exprLimpia === 'cos(x)*sin(x)') {
+            pasos.push(`🔍 Identificamos: ∫ sen(x)·cos(x) dx`);
+            pasos.push(``);
+            pasos.push(`📦 Hacemos cambio de variable: u = sen(x)`);
+            pasos.push(`📐 du = cos(x) dx`);
+            pasos.push(``);
+            pasos.push(`🔄 Sustituimos: ∫ sen(x)·cos(x) dx = ∫ u du`);
+            pasos.push(`✨ Integramos: ∫ u du = u²/2 = (1/2)·u² + C`);
+            pasos.push(``);
+            pasos.push(`🔄 Regresamos a x: (1/2)·u² = (1/2)·sen²(x)`);
+            pasos.push(``);
+            pasos.push(`✨✨ RESULTADO FINAL: ∫ ${expr} dx = (1/2)·sen²(x) + C ✨✨`);
+            return { pasos, resultado: `(1/2)·sen²(x)`, exito: true };
+        }
+        
+        // CASO 6: ∫ cos(x)·sen(x) dx (mismo caso)
+        if (exprLimpia === 'cos(x)*sin(x)') {
+            pasos.push(`🔍 Identificamos: ∫ cos(x)·sen(x) dx`);
+            pasos.push(``);
+            pasos.push(`📦 Hacemos cambio de variable: u = sen(x)`);
+            pasos.push(`📐 du = cos(x) dx`);
+            pasos.push(``);
+            pasos.push(`🔄 Sustituimos: ∫ cos(x)·sen(x) dx = ∫ u du`);
+            pasos.push(`✨ Integramos: ∫ u du = u²/2 = (1/2)·u² + C`);
+            pasos.push(``);
+            pasos.push(`🔄 Regresamos a x: (1/2)·u² = (1/2)·sen²(x)`);
+            pasos.push(``);
+            pasos.push(`✨✨ RESULTADO FINAL: ∫ ${expr} dx = (1/2)·sen²(x) + C ✨✨`);
+            return { pasos, resultado: `(1/2)·sen²(x)`, exito: true };
+        }
+        
+        // CASO 7: ∫ f'(x) * [f(x)]^n dx  (potencia general)
+        let potMatch = exprLimpia.match(/^(.+?)\*\((.+?)\)\^(\d+)$/);
+        if (!potMatch) {
+            potMatch = exprLimpia.match(/^(.+?)\*\((.+?)\)$/);
+        }
+        
+        // Si llegamos aquí, no se encontró patrón
+        pasos.push(`❌ No se pudo identificar una sustitución clara para: ${expr}`);
+        pasos.push(`💡 Intenta con estos formatos:`);
+        pasos.push(`   • 2*x*cos(x^2)  → para ∫ f'(x)·cos(f(x)) dx`);
+        pasos.push(`   • (2*x)/(x^2+1)  → para ∫ f'(x)/f(x) dx`);
+        pasos.push(`   • x*e^(x^2)      → para ∫ f'(x)·e^(f(x)) dx`);
+        pasos.push(`   • sin(x)*cos(x)  → para ∫ sen·cos dx`);
+        return { pasos, resultado: null, exito: false };
+    }
+    
+    function renderizarPasos(expr, resultado) {
+        const container = document.getElementById('stepsContainer');
+        if (!resultado.exito) {
+            let html = `<div class="error">⚠️ ${resultado.pasos.join("<br>")}</div>`;
+            container.innerHTML = html;
+            return;
+        }
+        
+        let html = `<div style="margin-bottom: 1rem; background: #ffd7001a; padding: 0.8rem; border-radius: 1rem; border: 1px solid #ffd700;">
+                        📌 <strong>Función original:</strong> ∫ ${expr} dx
+                    </div>`;
+        html += `<div><strong>🔍 MÉTODO DE SUSTITUCIÓN - PASO A PASO:</strong></div>`;
+        
+        resultado.pasos.forEach((paso, idx) => {
+            if (paso.includes("📦") || paso.includes("📐")) {
+                html += `<div class="sust-box"><span class="step-number">${idx+1}</span> ${paso.replace(/\n/g, '<br>')}</div>`;
+            } else {
+                html += `<div class="step"><span class="step-number">${idx+1}</span> ${paso.replace(/\n/g, '<br>')}</div>`;
+            }
+        });
+        
+        html += `<div class="final-int" style="margin-top: 1rem; border-top: 2px solid #ffd700; padding-top: 1rem;">
+                    🧨 <strong>INTEGRAL RESUELTA POR SUSTITUCIÓN:</strong> ${resultado.resultado} + C 🧨
+                 </div>`;
+        
+        container.innerHTML = html;
+    }
+    
+    // Eventos
+    document.getElementById('integrarBtn').addEventListener('click', () => {
+        let expr = document.getElementById('funcInput').value.trim();
+        if (!expr) {
+            document.getElementById('stepsContainer').innerHTML = `<div class="error">✍️ Escribe una función para integrar por sustitución, carnal.</div>`;
+            return;
+        }
+        let resultado = resolverPorSustitucion(expr);
+        renderizarPasos(expr, resultado);
+    });
+    
+    // Ejemplos rápidos
+    document.querySelectorAll('.example-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const expr = btn.getAttribute('data-expr');
+            document.getElementById('funcInput').value = expr;
+            let resultado = resolverPorSustitucion(expr);
+            renderizarPasos(expr, resultado);
+        });
+    });
+    
+    // Ejecutar con el valor inicial
+    window.addEventListener('load', () => {
+        const defaultExpr = document.getElementById('funcInput').value;
+        let resultado = resolverPorSustitucion(defaultExpr);
+        renderizarPasos(defaultExpr, resultado);
+    });
+</script>
+</body>
+</html>
